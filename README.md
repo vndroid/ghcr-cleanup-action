@@ -1,9 +1,9 @@
 # GitHub Container Registry Image Vacuum Action
 
-[![GitHub Super-Linter](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/ci.yml/badge.svg)
-[![Check dist/](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/check-dist.yml)
-[![CodeQL](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/dataaxiom/ghcr-cleanup-action/actions/workflows/codeql-analysis.yml)
+[![GitHub Super-Linter](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/ci.yml/badge.svg)
+[![Check dist/](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/check-dist.yml)
+[![CodeQL](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/vndroid/ghcr-io-vacuum-action/actions/workflows/codeql-analysis.yml)
 
 A workflow action that deletes images from the GitHub Container Registry
 (ghcr.io).
@@ -480,7 +480,7 @@ jobs:
     steps:
       - uses: vndroid/ghcr-io-vacuum-action@v1
         with:
-          owner: dataaxiom
+          owner: vndroid
           repository: tiecd
           package: tiecd
           delete-tags: '^mytag[12]$'
@@ -560,7 +560,7 @@ action.
 ### Package Restoration
 
 GitHub has a package restoration API capability. The package IDs are printed in
-the workflow log where the ghcr-cleanup-action is run.
+the workflow log where the ghcr-io-vacuum-action is run.
 
 [Restore Organization Package](https://docs.github.com/en/rest/packages/packages?apiVersion=2022-11-28#restore-package-version-for-an-organization)
 

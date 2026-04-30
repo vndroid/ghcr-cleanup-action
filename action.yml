@@ -4,7 +4,7 @@ description: >
   Vacuum stale GHCR images with flexible retention for tagged, untagged,
   multi-arch, and attestation artifacts.
 
-author: Dataaxiom Inc
+author: vndroid
 
 branding:
   icon: trash-2

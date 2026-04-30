@@ -513,7 +513,7 @@ jobs:
         uses: ./
         with:
           validate: true
-          packages: ghcr-cleanup-action,ghcr-cleanup-action-cache
+          packages: ghcr-io-vacuum-action,ghcr-io-vacuum-action-cache
           keep-n-tagged: 1
           delete-untagged: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -647,7 +647,7 @@ jobs:
         uses: ./
         with:
           validate: true
-          packages: ghcr-cleanup-action*
+          packages: ghcr-io-vacuum-action*
           keep-n-tagged: 1
           delete-untagged: true
           expand-packages: true

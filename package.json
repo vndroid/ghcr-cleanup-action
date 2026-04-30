@@ -1,15 +1,15 @@
 {
-  "name": "ghcr-cleanup-action",
+  "name": "ghcr-io-vacuum-action",
   "description": "GitHub Container Registry Cleanup Action",
   "version": "main",
-  "author": "Dataaxiom Inc",
-  "homepage": "https://github.com/dataaxiom/ghcr-cleanup-action",
+  "author": "vndroid",
+  "homepage": "https://github.com/vndroid/ghcr-io-vacuum-action",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dataaxiom/ghcr-cleanup-action.git"
+    "url": "git+https://github.com/vndroid/ghcr-io-vacuum-action.git"
   },
   "bugs": {
-    "url": "https://github.com/dataaxiom/ghcr-cleanup-action/issues"
+    "url": "https://github.com/vndroid/ghcr-io-vacuum-action/issues"
   },
   "keywords": [
     "ci",
