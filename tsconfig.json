@@ -2,10 +2,9 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "node16",
+    "module": "nodenext",
     "rootDir": "./src",
-    "moduleResolution": "node16",
-    "baseUrl": "./",
+    "moduleResolution": "nodenext",
     "sourceMap": true,
     "outDir": "./dist",
     "noImplicitAny": true,
