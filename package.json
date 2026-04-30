@@ -1,6 +1,6 @@
 {
   "name": "ghcr-io-vacuum-action",
-  "description": "GitHub Container Registry Cleanup Action",
+  "description": "GitHub Container Registry Vacuum Action",
   "version": "main",
   "author": "vndroid",
   "homepage": "https://github.com/vndroid/ghcr-io-vacuum-action",
