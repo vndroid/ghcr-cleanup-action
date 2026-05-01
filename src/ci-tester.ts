@@ -216,7 +216,7 @@ export async function run(): Promise<void> {
       args.token
     )
   } else if (args.mode === 'prime') {
-    // push dummy image - repo once it's created and has an iamge it requires atleast one image
+    // push dummy image - repo once it's created and has an image it requires at least one image
     pushImage(
       `busybox@${dummyDigest}`, // 1.31
       `ghcr.io/${config.owner}/${config.package}:dummy`,
@@ -360,7 +360,7 @@ export async function run(): Promise<void> {
           }
         }
 
-        // is there a refferrer digest
+        // is there a referrer digest
         const referrerTag = digest.replace('sha256:', 'sha256-')
         if (tags.has(referrerTag)) {
           fs.appendFileSync(

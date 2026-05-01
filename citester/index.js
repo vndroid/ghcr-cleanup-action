@@ -37267,7 +37267,7 @@ async function run() {
         `ghcr.io/${config.owner}/${config.package}:dummy`, undefined, args.token);
     }
     else if (args.mode === 'prime') {
-        // push dummy image - repo once it's created and has an iamge it requires atleast one image
+        // push dummy image - repo once it's created and has an image it requires at least one image
         pushImage(`busybox@${dummyDigest}`, // 1.31
         `ghcr.io/${config.owner}/${config.package}:dummy`, undefined, args.token);
         // load after dummy to make sure the package exists on first clone/setup
@@ -37384,7 +37384,7 @@ async function run() {
                         fs__WEBPACK_IMPORTED_MODULE_1___default().appendFileSync(`${args.directory}/expected-digests`, `${manifestDigest.digest}\n`);
                     }
                 }
-                // is there a refferrer digest
+                // is there a referrer digest
                 const referrerTag = digest.replace('sha256:', 'sha256-');
                 if (tags.has(referrerTag)) {
                     fs__WEBPACK_IMPORTED_MODULE_1___default().appendFileSync(`${args.directory}/expected-tags`, `${referrerTag}\n`);
@@ -41337,7 +41337,7 @@ class Config {
             auth: this.token,
             baseUrl: githubUrl,
             throttle: {
-                // @ts-expect-error: esm errror
+                // @ts-expect-error: esm error
                 onRateLimit: (retryAfter, options, octokit, retryCount) => {
                     lib_core/* info */.pq(`Octokit - request quota exhausted for request ${options.method} ${options.url}`);
                     if (retryCount < 3) {
@@ -41346,7 +41346,7 @@ class Config {
                         return true;
                     }
                 },
-                // @ts-expect-error: esm errror
+                // @ts-expect-error: esm error
                 onSecondaryRateLimit: (retryAfter, options, octokit) => {
                     // does not retry, only logs a warning
                     lib_core/* info */.pq(`Octokit - secondaryRateLimit detected for request ${options.method} ${options.url}`);
@@ -41400,7 +41400,7 @@ function buildConfig() {
     config.owner = core.getInput('owner');
     config.repository = core.getInput('repository');
     if (core.getInput('package') && core.getInput('packages')) {
-        throw Error('package and packages cant be used at the same time, use either one');
+        throw Error('package and packages can not be used at the same time, use either one');
     }
     config.package = core.getInput('package');
     if (!config.package) {
@@ -41443,7 +41443,7 @@ function buildConfig() {
         }
     }
     if (core.getInput('tags') && core.getInput('delete-tags')) {
-        throw Error('tags and delete-tags cant be used at the same time, use either one');
+        throw Error('tags and delete-tags can not be used at the same time, use either one');
     }
     if (core.getInput('tags')) {
         config.deleteTags = core.getInput('tags');
@@ -41851,7 +41851,7 @@ class PackageRepo {
                             this.lastDeleteResult = false;
                         }
                         else {
-                            _actions_core__WEBPACK_IMPORTED_MODULE_0__/* .warning */ .$e('Multiple 404 errors have occured, check the package settings and ensure the repository has been granted admin access');
+                            _actions_core__WEBPACK_IMPORTED_MODULE_0__/* .warning */ .$e('Multiple 404 errors have occurred, check the package settings and ensure the repository has been granted admin access');
                         }
                     }
                 }

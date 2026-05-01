@@ -2,14 +2,9 @@ name: Integration Tests
 
 on:
   push:
-  pull_request_target:
-    types: [assigned, opened, synchronize, reopened]
 
 permissions:
-  id-token: write
-  packages: write
   contents: read
-  attestations: write
 
 concurrency:
   group: ci-tests
@@ -22,10 +17,14 @@ jobs:
   general-tests:
     name: General Tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         id: setup-node
@@ -54,6 +53,9 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
     needs: general-tests
+    permissions:
+      contents: read
+      packages: write
 
     strategy:
       max-parallel: 1
@@ -194,6 +196,8 @@ jobs:
       # Setup for test execution
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -334,11 +338,18 @@ jobs:
     env:
       REGISTRY: ghcr.io
     needs: integration-tests
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
 
     steps:
       # Setup for test execution
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -443,10 +454,16 @@ jobs:
     name: Cosign Test
     needs: github-attestation-tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -504,10 +521,41 @@ jobs:
     name: Cleanup Multiple Packages
     runs-on: ubuntu-24.04
     needs: cosign-test
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure the initial successful
+        run: |
+          REPO="${GITHUB_REPOSITORY@L}"
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          PACKAGE_NAME="${GITHUB_REPOSITORY#*/}-cache"
+          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/users/${OWNER}/packages/container/${PACKAGE_NAME}")
+          if [ "$STATUS" = "404" ]; then
+            echo "Package not found (status $STATUS), pushing busybox as placeholder..."
+            docker pull busybox:latest
+            docker tag busybox:latest "${{ env.REGISTRY }}/${REPO}-cache:latest"
+            docker push "${{ env.REGISTRY }}/${REPO}-cache:latest"
+          else
+            echo "Package already exists (status $STATUS), skipping."
+          fi
 
       - name: Run Test - Multi-package Cleanup
         uses: ./
@@ -522,10 +570,15 @@ jobs:
     name: Shared Images Tagged Test
     runs-on: ubuntu-24.04
     needs: multi-package-cleanup
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
@@ -579,10 +632,15 @@ jobs:
     name: Shared Images Untagged Test
     runs-on: ubuntu-24.04
     needs: shared-image-tagged-test
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
@@ -637,10 +695,14 @@ jobs:
     needs: shared-image-untagged-test
     env:
       GHCR_PAT: ${{secrets.GHCR_PAT}}
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Run Test - Multi-package Cleanup
         if: ${{ env.GHCR_PAT }}

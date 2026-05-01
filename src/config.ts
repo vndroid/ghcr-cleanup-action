@@ -58,7 +58,7 @@ export class Config {
       auth: this.token,
       baseUrl: githubUrl,
       throttle: {
-        // @ts-expect-error: esm errror
+        // @ts-expect-error: esm error
         onRateLimit: (
           retryAfter: number,
           options: EndpointDefaults,
@@ -75,7 +75,7 @@ export class Config {
             return true
           }
         },
-        // @ts-expect-error: esm errror
+        // @ts-expect-error: esm error
         onSecondaryRateLimit: (
           retryAfter: number,
           options: EndpointDefaults,
@@ -142,7 +142,7 @@ export function buildConfig(): Config {
 
   if (core.getInput('package') && core.getInput('packages')) {
     throw Error(
-      'package and packages cant be used at the same time, use either one'
+      'package and packages can not be used at the same time, use either one'
     )
   }
   config.package = core.getInput('package')
@@ -188,7 +188,7 @@ export function buildConfig(): Config {
 
   if (core.getInput('tags') && core.getInput('delete-tags')) {
     throw Error(
-      'tags and delete-tags cant be used at the same time, use either one'
+      'tags and delete-tags can not be used at the same time, use either one'
     )
   }
   if (core.getInput('tags')) {

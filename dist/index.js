@@ -43455,7 +43455,7 @@ class Config {
             auth: this.token,
             baseUrl: githubUrl,
             throttle: {
-                // @ts-expect-error: esm errror
+                // @ts-expect-error: esm error
                 onRateLimit: (retryAfter, options, octokit, retryCount) => {
                     info(`Octokit - request quota exhausted for request ${options.method} ${options.url}`);
                     if (retryCount < 3) {
@@ -43464,7 +43464,7 @@ class Config {
                         return true;
                     }
                 },
-                // @ts-expect-error: esm errror
+                // @ts-expect-error: esm error
                 onSecondaryRateLimit: (retryAfter, options, octokit) => {
                     // does not retry, only logs a warning
                     info(`Octokit - secondaryRateLimit detected for request ${options.method} ${options.url}`);
@@ -43518,7 +43518,7 @@ function buildConfig() {
     config.owner = getInput('owner');
     config.repository = getInput('repository');
     if (getInput('package') && getInput('packages')) {
-        throw Error('package and packages cant be used at the same time, use either one');
+        throw Error('package and packages can not be used at the same time, use either one');
     }
     config.package = getInput('package');
     if (!config.package) {
@@ -43561,7 +43561,7 @@ function buildConfig() {
         }
     }
     if (getInput('tags') && getInput('delete-tags')) {
-        throw Error('tags and delete-tags cant be used at the same time, use either one');
+        throw Error('tags and delete-tags can not be used at the same time, use either one');
     }
     if (getInput('tags')) {
         config.deleteTags = getInput('tags');
@@ -43958,7 +43958,7 @@ class PackageRepo {
                             this.lastDeleteResult = false;
                         }
                         else {
-                            warning('Multiple 404 errors have occured, check the package settings and ensure the repository has been granted admin access');
+                            warning('Multiple 404 errors have occurred, check the package settings and ensure the repository has been granted admin access');
                         }
                     }
                 }
@@ -51468,15 +51468,15 @@ class CleanupTask {
         for (const digest of this.filterSet) {
             let ghostImage = false;
             // is a ghost image if all of the child manifests don't exist
-            const manfiest = await this.registry.getManifestByDigest(digest);
-            if (manfiest.manifests) {
+            const manifest = await this.registry.getManifestByDigest(digest);
+            if (manifest.manifests) {
                 let missing = 0;
-                for (const imageManfiest of manfiest.manifests) {
-                    if (!this.packageRepo.getIdByDigest(imageManfiest.digest)) {
+                for (const imagemanifest of manifest.manifests) {
+                    if (!this.packageRepo.getIdByDigest(imagemanifest.digest)) {
                         missing += 1;
                     }
                 }
-                if (missing === manfiest.manifests.length) {
+                if (missing === manifest.manifests.length) {
                     ghostImage = true;
                     foundGhostImage = true;
                 }
@@ -51505,10 +51505,10 @@ class CleanupTask {
         for (const digest of this.filterSet) {
             let partialImage = false;
             // is a partial image if some of the child manifests don't exist
-            const manfiest = await this.registry.getManifestByDigest(digest);
-            if (manfiest.manifests) {
-                for (const imageManfiest of manfiest.manifests) {
-                    if (!this.packageRepo.getIdByDigest(imageManfiest.digest)) {
+            const manifest = await this.registry.getManifestByDigest(digest);
+            if (manifest.manifests) {
+                for (const imagemanifest of manifest.manifests) {
+                    if (!this.packageRepo.getIdByDigest(imagemanifest.digest)) {
                         partialImage = true;
                         partialImagesFound = true;
                         break;
@@ -51612,7 +51612,7 @@ class CleanupTask {
             // get the tags that match the config option
             const matchTags = this.expandTags();
             if (matchTags.size > 0) {
-                // build seperate sets for the untagging events and the standard deletions
+                // build separate sets for the untagging events and the standard deletions
                 const untaggingTags = new Set();
                 const standardTags = new Set();
                 // first process untagging events - do a pre scan to check if in this mode
@@ -51652,7 +51652,7 @@ class CleanupTask {
                                 info(`${tag}`);
                                 // get the package
                                 const manifest = await this.registry.getManifestByDigest(manifestDigest);
-                                // preform a "ghcr.io" image deletion
+                                // perform a "ghcr.io" image deletion
                                 // as the registry doesn't support manifest deletion directly
                                 // we instead assign the tag to a different manifest first
                                 // then we delete it
@@ -51826,7 +51826,7 @@ class CleanupTask {
         }
         endGroup();
     }
-    // makes sure all required manfiests are downloaded before the deletion
+    // makes sure all required manifests are downloaded before the deletion
     // process runs. ensuring only package api calls are made during deletion
     // minimizing chances of failed registry calls affecting deletion
     async primeManifests() {
@@ -51907,7 +51907,7 @@ class CleanupTask {
             // delete all untagged images
             await this.deleteUntagged();
         }
-        // now preform the actual deletion
+        // now perform the actual deletion
         await this.doDelete();
         // print out the statistics
         this.statistics.print();

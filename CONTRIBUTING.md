@@ -11,7 +11,7 @@ npm run bundle
 ## Running CI Tests
 
 On forked repos the ci.yml workflow will run an publish into a package
-"ghcr-io-vacuum-action", it's recommended to change the visability of that
+"ghcr-io-vacuum-action", it's recommended to change the visibility of that
 package to "private".
 
 ## Publishing a New Release

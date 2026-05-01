@@ -430,15 +430,15 @@ export class CleanupTask {
     for (const digest of this.filterSet) {
       let ghostImage = false
       // is a ghost image if all of the child manifests don't exist
-      const manfiest = await this.registry.getManifestByDigest(digest)
-      if (manfiest.manifests) {
+      const manifest = await this.registry.getManifestByDigest(digest)
+      if (manifest.manifests) {
         let missing = 0
-        for (const imageManfiest of manfiest.manifests) {
-          if (!this.packageRepo.getIdByDigest(imageManfiest.digest)) {
+        for (const imagemanifest of manifest.manifests) {
+          if (!this.packageRepo.getIdByDigest(imagemanifest.digest)) {
             missing += 1
           }
         }
-        if (missing === manfiest.manifests.length) {
+        if (missing === manifest.manifests.length) {
           ghostImage = true
           foundGhostImage = true
         }
@@ -468,10 +468,10 @@ export class CleanupTask {
     for (const digest of this.filterSet) {
       let partialImage = false
       // is a partial image if some of the child manifests don't exist
-      const manfiest = await this.registry.getManifestByDigest(digest)
-      if (manfiest.manifests) {
-        for (const imageManfiest of manfiest.manifests) {
-          if (!this.packageRepo.getIdByDigest(imageManfiest.digest)) {
+      const manifest = await this.registry.getManifestByDigest(digest)
+      if (manifest.manifests) {
+        for (const imagemanifest of manifest.manifests) {
+          if (!this.packageRepo.getIdByDigest(imagemanifest.digest)) {
             partialImage = true
             partialImagesFound = true
             break
@@ -580,7 +580,7 @@ export class CleanupTask {
       const matchTags = this.expandTags()
 
       if (matchTags.size > 0) {
-        // build seperate sets for the untagging events and the standard deletions
+        // build separate sets for the untagging events and the standard deletions
         const untaggingTags = new Set<string>()
         const standardTags = new Set<string>()
 
@@ -626,7 +626,7 @@ export class CleanupTask {
                 const manifest =
                   await this.registry.getManifestByDigest(manifestDigest)
 
-                // preform a "ghcr.io" image deletion
+                // perform a "ghcr.io" image deletion
                 // as the registry doesn't support manifest deletion directly
                 // we instead assign the tag to a different manifest first
                 // then we delete it
@@ -835,7 +835,7 @@ export class CleanupTask {
     core.endGroup()
   }
 
-  // makes sure all required manfiests are downloaded before the deletion
+  // makes sure all required manifests are downloaded before the deletion
   // process runs. ensuring only package api calls are made during deletion
   // minimizing chances of failed registry calls affecting deletion
   async primeManifests(): Promise<void> {
@@ -922,7 +922,7 @@ export class CleanupTask {
       await this.deleteUntagged()
     }
 
-    // now preform the actual deletion
+    // now perform the actual deletion
     await this.doDelete()
 
     // print out the statistics
