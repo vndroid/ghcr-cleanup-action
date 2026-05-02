@@ -189,8 +189,9 @@ export class Registry {
   async putManifest(
     tag: string,
     manifest: Manifest,
-    _multiArch: boolean
+    multiArch: boolean
   ): Promise<void> {
+    void multiArch
     if (!this.config.dryRun) {
       const contentType = manifest.mediaType
       const config = {

@@ -41347,7 +41347,9 @@ class Config {
                     }
                 },
                 // @ts-expect-error: esm error
-                onSecondaryRateLimit: (retryAfter, options, _octokit) => {
+                onSecondaryRateLimit: (retryAfter, options, octokit) => {
+                    void retryAfter;
+                    void octokit;
                     // does not retry, only logs a warning
                     lib_core/* info */.pq(`Octokit - secondaryRateLimit detected for request ${options.method} ${options.url}`);
                 }
@@ -48801,7 +48803,8 @@ class Registry {
      * @param multiArch - A boolean indicating whether the manifest is for a multi-architecture image.
      * @returns A Promise that resolves when the manifest is successfully put in the registry.
      */
-    async putManifest(tag, manifest, _multiArch) {
+    async putManifest(tag, manifest, multiArch) {
+        void multiArch;
         if (!this.config.dryRun) {
             const contentType = manifest.mediaType;
             const config = {

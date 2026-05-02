@@ -78,8 +78,10 @@ export class Config {
         onSecondaryRateLimit: (
           retryAfter: number,
           options: { method: string; url: string },
-          _octokit: Octokit
+          octokit: Octokit
         ) => {
+          void retryAfter
+          void octokit
           // does not retry, only logs a warning
           core.info(
             `Octokit - secondaryRateLimit detected for request ${options.method} ${options.url}`
