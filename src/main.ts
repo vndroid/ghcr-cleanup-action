@@ -192,7 +192,7 @@ class CleanupAction {
 
     // Results per package
     summary.addHeading('Results', 2)
-    const resultRows: any[] = [
+    const resultRows: ({ data: string; header?: boolean } | string)[][] = [
       [
         { data: 'Package', header: true },
         { data: 'Total Deleted', header: true },

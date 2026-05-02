@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import { Config, LogLevel } from './config.js'
 import { RequestError } from '@octokit/request-error'
+import { GhPackage } from './utils.js'
 
 /**
  * Provides access to a package via the GitHub Packages REST API.
@@ -10,10 +11,10 @@ export class PackageRepo {
   config: Config
 
   // Map of digests to package ids
-  digest2Id = new Map<string, string>()
+  digest2Id = new Map<string, number>()
 
   // Map of ids to package version definitions
-  id2Package = new Map<string, any>()
+  id2Package = new Map<number, GhPackage>()
 
   // Map of tags to digests
   tag2Digest = new Map<string, string>()
@@ -40,10 +41,11 @@ export class PackageRepo {
       this.id2Package.clear()
       this.tag2Digest.clear()
 
-      let getFunc =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let getFunc: any =
         this.config.octokit.rest.packages
           .getAllPackageVersionsForPackageOwnedByOrg
-      let getParams
+      let getParams: Record<string, unknown>
 
       if (this.config.repoType === 'User') {
         getFunc = this.config.isPrivateRepo
@@ -149,7 +151,7 @@ export class PackageRepo {
    * Return the package version id for the given digest
    * @returns The the package id
    */
-  getIdByDigest(digest: string): string | undefined {
+  getIdByDigest(digest: string): number | undefined {
     return this.digest2Id.get(digest)
   }
 
@@ -158,7 +160,7 @@ export class PackageRepo {
    * @param digest The digest to lookup
    * @returns The the package descriptor
    */
-  getPackageByDigest(digest: string): any | undefined {
+  getPackageByDigest(digest: string): GhPackage | undefined {
     let ghPackage
     const id = this.digest2Id.get(digest)
     if (id) {
@@ -176,7 +178,7 @@ export class PackageRepo {
    */
   async deletePackageVersion(
     targetPackage: string,
-    id: string,
+    id: number,
     digest: string,
     tags?: string[],
     label?: string
@@ -254,8 +256,9 @@ export class PackageRepo {
   async getPackageList(): Promise<string[]> {
     const packages = []
 
-    let listFunc
-    let listParams
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let listFunc: any
+    let listParams: Record<string, unknown>
 
     if (this.config.repoType === 'User') {
       listFunc = this.config.isPrivateRepo

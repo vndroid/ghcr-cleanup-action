@@ -85,3 +85,42 @@ export class CleanupTaskStatistics {
     core.endGroup()
   }
 }
+
+export interface ManifestLayer {
+  mediaType: string
+  digest: string
+  size: number
+}
+
+export interface ManifestPlatform {
+  architecture: string
+  variant?: string
+  os?: string
+}
+
+export interface ManifestEntry {
+  digest: string
+  mediaType?: string
+  size?: number
+  platform?: ManifestPlatform
+  artifactType?: string
+}
+
+export interface Manifest {
+  mediaType?: string
+  schemaVersion?: number
+  manifests?: ManifestEntry[]
+  layers?: ManifestLayer[]
+  config?: ManifestLayer
+}
+
+export interface GhPackage {
+  id: number
+  name: string
+  updated_at: string
+  metadata: {
+    container: {
+      tags: string[]
+    }
+  }
+}

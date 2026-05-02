@@ -3,7 +3,7 @@ import { Config, LogLevel } from './config.js'
 import { Registry } from './registry.js'
 import { PackageRepo } from './package-repo.js'
 import wcmatch from 'wildcard-match'
-import { CleanupTaskStatistics } from './utils.js'
+import { CleanupTaskStatistics, GhPackage, ManifestEntry } from './utils.js'
 
 export class CleanupTask {
   // The action configuration
@@ -128,7 +128,7 @@ export class CleanupTask {
         `[${this.targetPackage}] Finding images that are older than: ${this.config.olderThanReadable}`
       )
       for (const digest of this.filterSet) {
-        const ghPackage = this.packageRepo.getPackageByDigest(digest)
+        const ghPackage = this.packageRepo.getPackageByDigest(digest)!
         if (ghPackage.updated_at) {
           const cutOff = new Date(Date.now() - this.config.olderThan)
           const packageDate = new Date(ghPackage.updated_at)
@@ -137,7 +137,7 @@ export class CleanupTask {
             this.filterSet.delete(digest)
           } else {
             const tags =
-              this.packageRepo.getPackageByDigest(digest).metadata.container
+              this.packageRepo.getPackageByDigest(digest)!.metadata.container
                 .tags
             if (tags.length > 0) {
               core.info(`${digest} ${tags}`)
@@ -259,7 +259,7 @@ export class CleanupTask {
       if (!processedManifests.has(digest)) {
         const manifest = await this.registry.getManifestByDigest(digest)
         const tags =
-          this.packageRepo.getPackageByDigest(digest).metadata.container.tags
+          this.packageRepo.getPackageByDigest(digest)!.metadata.container.tags
         if (manifest.manifests) {
           for (const childImage of manifest.manifests) {
             // mark it as processed
@@ -304,7 +304,7 @@ export class CleanupTask {
     core.endGroup()
   }
 
-  async buildLabel(imageManifest: any): Promise<string> {
+  async buildLabel(imageManifest: ManifestEntry): Promise<string> {
     // build the 'label'
     let label = ''
     if (imageManifest.platform) {
@@ -343,7 +343,7 @@ export class CleanupTask {
     return label
   }
 
-  async deleteImage(ghPackage: any): Promise<void> {
+  async deleteImage(ghPackage: GhPackage): Promise<void> {
     if (!this.deleted.has(ghPackage.name)) {
       // get the manifest first
       const manifest = await this.registry.getManifestByDigest(ghPackage.name)
@@ -417,7 +417,9 @@ export class CleanupTask {
             const attestationPackage =
               this.packageRepo.getPackageByDigest(manifestDigest)
             // recursively delete it
-            await this.deleteImage(attestationPackage)
+            if (attestationPackage) {
+              await this.deleteImage(attestationPackage)
+            }
           }
         }
       }
@@ -448,7 +450,7 @@ export class CleanupTask {
         this.filterSet.delete(digest)
         this.deleteSet.add(digest)
 
-        const ghPackage = this.packageRepo.getPackageByDigest(digest)
+        const ghPackage = this.packageRepo.getPackageByDigest(digest)!
         if (ghPackage.metadata.container.tags.length > 0) {
           core.info(`${digest} ${ghPackage.metadata.container.tags}`)
         } else {
@@ -483,7 +485,7 @@ export class CleanupTask {
         this.filterSet.delete(digest)
         this.deleteSet.add(digest)
 
-        const ghPackage = this.packageRepo.getPackageByDigest(digest)
+        const ghPackage = this.packageRepo.getPackageByDigest(digest)!
         if (ghPackage.metadata.container.tags.length > 0) {
           core.info(`${digest} ${ghPackage.metadata.container.tags}`)
         } else {
@@ -537,7 +539,7 @@ export class CleanupTask {
         const regex = new RegExp(this.config.deleteTags)
         // build match list from filterSet
         for (const digest of this.filterSet) {
-          const ghPackage = this.packageRepo.getPackageByDigest(digest)
+          const ghPackage = this.packageRepo.getPackageByDigest(digest)!
           for (const tag of ghPackage.metadata.container.tags) {
             if (regex.test(tag)) {
               matchTags.add(tag)
@@ -556,7 +558,7 @@ export class CleanupTask {
         const isTagMatch = wcmatch(this.config.deleteTags.split(','))
         // build match list from filterSet
         for (const digest of this.filterSet) {
-          const ghPackage = this.packageRepo.getPackageByDigest(digest)
+          const ghPackage = this.packageRepo.getPackageByDigest(digest)!
           for (const tag of ghPackage.metadata.container.tags) {
             if (isTagMatch(tag)) {
               matchTags.add(tag)
@@ -594,7 +596,7 @@ export class CleanupTask {
               const manifestDigest = this.packageRepo.getDigestByTag(tag)
               if (manifestDigest) {
                 const ghPackage =
-                  this.packageRepo.getPackageByDigest(manifestDigest)
+                  this.packageRepo.getPackageByDigest(manifestDigest)!
                 if (ghPackage.metadata.container.tags.length > 1) {
                   untaggingTags.add(tag)
                 } else if (ghPackage.metadata.container.tags.length === 1) {
@@ -616,7 +618,7 @@ export class CleanupTask {
             const manifestDigest = this.packageRepo.getDigestByTag(tag)
             if (manifestDigest) {
               const ghPackage =
-                this.packageRepo.getPackageByDigest(manifestDigest)
+                this.packageRepo.getPackageByDigest(manifestDigest)!
               if (ghPackage.metadata.container.tags.length === 1) {
                 standardTags.add(tag)
               } else {
@@ -715,11 +717,11 @@ export class CleanupTask {
       )
 
       // create a temporary array of untagged images to process on
-      const unTaggedPackages = []
+      const unTaggedPackages: GhPackage[] = []
 
       // find untagged images in the filterSet
       for (const digest of this.filterSet) {
-        const ghPackage = this.packageRepo.getPackageByDigest(digest)
+        const ghPackage = this.packageRepo.getPackageByDigest(digest)!
         if (ghPackage.metadata.container.tags.length === 0) {
           unTaggedPackages.push(ghPackage)
         }
@@ -760,7 +762,7 @@ export class CleanupTask {
       )
 
       // create a temporary array of tagged images to process on
-      const taggedPackages = []
+      const taggedPackages: GhPackage[] = []
 
       if (this.config.deleteTags != null) {
         // apply the keep-n mode only on the supplied/expanded tags
@@ -777,7 +779,7 @@ export class CleanupTask {
       } else {
         // copy images with tags from the full set
         for (const digest of this.filterSet) {
-          const ghPackage = this.packageRepo.getPackageByDigest(digest)
+          const ghPackage = this.packageRepo.getPackageByDigest(digest)!
           if (ghPackage.metadata.container.tags.length > 0) {
             taggedPackages.push(ghPackage)
           }
@@ -798,7 +800,7 @@ export class CleanupTask {
 
           const ghPackage = this.packageRepo.getPackageByDigest(
             deletePackage.name
-          )
+          )!
           core.info(
             `${deletePackage.name} ${ghPackage.metadata.container.tags}`
           )
@@ -821,7 +823,7 @@ export class CleanupTask {
 
     // find untagged images in the filterSet
     for (const digest of this.filterSet) {
-      const ghPackage = this.packageRepo.getPackageByDigest(digest)
+      const ghPackage = this.packageRepo.getPackageByDigest(digest)!
       if (ghPackage.metadata.container.tags.length === 0) {
         this.deleteSet.add(digest)
         this.filterSet.delete(digest)
@@ -845,7 +847,7 @@ export class CleanupTask {
       if (manifest.manifests) {
         for (const imageManifest of manifest.manifests) {
           // call the buildLabel method which will prime manifest if its needed
-          if (digests.has(imageManifest)) {
+          if (digests.has(imageManifest.digest)) {
             await this.buildLabel(imageManifest)
           }
         }
@@ -861,7 +863,7 @@ export class CleanupTask {
               await this.registry.getManifestByDigest(tagDigest)
             if (tagManifest.manifests) {
               for (const manifestEntry of tagManifest.manifests) {
-                if (digests.has(manifestEntry)) {
+                if (digests.has(manifestEntry.digest)) {
                   await this.buildLabel(manifestEntry)
                 }
               }
@@ -884,7 +886,7 @@ export class CleanupTask {
     core.startGroup(`[${this.targetPackage}] Deleting packages`)
     if (this.deleteSet.size > 0) {
       for (const deleteDigest of this.deleteSet) {
-        const deleteImage = this.packageRepo.getPackageByDigest(deleteDigest)
+        const deleteImage = this.packageRepo.getPackageByDigest(deleteDigest)!
         await this.deleteImage(deleteImage)
       }
     } else {

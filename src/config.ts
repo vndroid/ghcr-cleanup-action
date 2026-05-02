@@ -4,7 +4,6 @@ import { throttling } from '@octokit/plugin-throttling'
 import { retry } from '@octokit/plugin-retry'
 import { requestLog } from '@octokit/plugin-request-log'
 import { RequestError } from '@octokit/request-error'
-import type { EndpointDefaults } from '@octokit/types'
 import { MapPrinter } from './utils.js'
 import humanInterval from 'human-interval'
 
@@ -42,7 +41,7 @@ export class Config {
   token: string
   registryUrl?: string
   githubApiUrl?: string
-  octokit: any
+  octokit!: InstanceType<typeof MyOctokit>
 
   constructor(token: string) {
     this.token = token
@@ -61,7 +60,7 @@ export class Config {
         // @ts-expect-error: esm error
         onRateLimit: (
           retryAfter: number,
-          options: EndpointDefaults,
+          options: { method: string; url: string },
           octokit: Octokit,
           retryCount: number
         ) => {
@@ -78,8 +77,8 @@ export class Config {
         // @ts-expect-error: esm error
         onSecondaryRateLimit: (
           retryAfter: number,
-          options: EndpointDefaults,
-          octokit: Octokit
+          options: { method: string; url: string },
+          _octokit: Octokit
         ) => {
           // does not retry, only logs a warning
           core.info(

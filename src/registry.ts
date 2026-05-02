@@ -1,9 +1,14 @@
 import * as core from '@actions/core'
 import { Config, LogLevel } from './config.js'
-import axios, { AxiosInstance, isAxiosError } from 'axios'
+import axios, {
+  AxiosInstance,
+  isAxiosError,
+  InternalAxiosRequestConfig,
+  AxiosResponse
+} from 'axios'
 import axiosRetry from 'axios-retry'
 import * as AxiosLogger from 'axios-logger'
-import { isValidChallenge, parseChallenge } from './utils.js'
+import { isValidChallenge, parseChallenge, Manifest } from './utils.js'
 import { setGlobalConfig } from 'axios-logger'
 import { PackageRepo } from './package-repo.js'
 
@@ -27,7 +32,7 @@ export class Registry {
   targetPackage = ''
 
   // cache of loaded manifests, by digest
-  manifestCache = new Map<string, any>()
+  manifestCache = new Map<string, Manifest>()
 
   // map of referrer manifests
   //referrersCache = new Map<string, any>()
@@ -59,8 +64,16 @@ export class Registry {
 
     // set the axios logging on if log level is debug
     if (this.config.logLevel === LogLevel.DEBUG) {
-      this.axios.interceptors.request.use(AxiosLogger.requestLogger as any)
-      this.axios.interceptors.response.use(AxiosLogger.responseLogger as any)
+      this.axios.interceptors.request.use(
+        AxiosLogger.requestLogger as (
+          config: InternalAxiosRequestConfig
+        ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
+      )
+      this.axios.interceptors.response.use(
+        AxiosLogger.responseLogger as (
+          response: AxiosResponse
+        ) => AxiosResponse | Promise<AxiosResponse>
+      )
     }
   }
 
@@ -131,9 +144,9 @@ export class Registry {
    * @param digest - The digest of the manifest to retrieve
    * @returns A Promise that resolves to the retrieved manifest
    */
-  async getManifestByDigest(digest: string): Promise<any> {
+  async getManifestByDigest(digest: string): Promise<Manifest> {
     if (this.manifestCache.has(digest)) {
-      return this.manifestCache.get(digest)
+      return this.manifestCache.get(digest)!
     } else {
       const response = await this.axios.get(
         `/v2/${this.config.owner}/${this.targetPackage}/manifests/${digest}`,
@@ -158,11 +171,12 @@ export class Registry {
    * @param tag - The tag of the manifest to retrieve
    * @returns A Promise that resolves to the retrieved manifest
    */
-  async getManifestByTag(tag: string): Promise<any> {
+  async getManifestByTag(tag: string): Promise<Manifest> {
     const tagDigest = this.githubPackageRepo.getDigestByTag(tag)
     if (tagDigest) {
       return await this.getManifestByDigest(tagDigest)
     }
+    return {} as Manifest
   }
 
   /**
@@ -174,8 +188,8 @@ export class Registry {
    */
   async putManifest(
     tag: string,
-    manifest: any,
-    multiArch: boolean
+    manifest: Manifest,
+    _multiArch: boolean
   ): Promise<void> {
     if (!this.config.dryRun) {
       const contentType = manifest.mediaType

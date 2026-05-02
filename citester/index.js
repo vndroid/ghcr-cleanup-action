@@ -41347,7 +41347,7 @@ class Config {
                     }
                 },
                 // @ts-expect-error: esm error
-                onSecondaryRateLimit: (retryAfter, options, octokit) => {
+                onSecondaryRateLimit: (retryAfter, options, _octokit) => {
                     // does not retry, only logs a warning
                     lib_core/* info */.pq(`Octokit - secondaryRateLimit detected for request ${options.method} ${options.url}`);
                 }
@@ -41677,6 +41677,7 @@ class PackageRepo {
             this.digest2Id.clear();
             this.id2Package.clear();
             this.tag2Digest.clear();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let getFunc = this.config.octokit.rest.packages
                 .getAllPackageVersionsForPackageOwnedByOrg;
             let getParams;
@@ -41867,6 +41868,7 @@ class PackageRepo {
      */
     async getPackageList() {
         const packages = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let listFunc;
         let listParams;
         if (this.config.repoType === 'User') {
@@ -48790,6 +48792,7 @@ class Registry {
         if (tagDigest) {
             return await this.getManifestByDigest(tagDigest);
         }
+        return {};
     }
     /**
      * Puts the manifest for a given tag in the registry.
@@ -48798,7 +48801,7 @@ class Registry {
      * @param multiArch - A boolean indicating whether the manifest is for a multi-architecture image.
      * @returns A Promise that resolves when the manifest is successfully put in the registry.
      */
-    async putManifest(tag, manifest, multiArch) {
+    async putManifest(tag, manifest, _multiArch) {
         if (!this.config.dryRun) {
             const contentType = manifest.mediaType;
             const config = {
